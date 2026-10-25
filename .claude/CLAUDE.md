@@ -8,14 +8,14 @@ This is a learning project. The app itself (a commute planner) is simple on purp
 
 ## Rules
 
-- Never commit `.env` files (they are in `.gitignore`).
+- Never commit `../.env` files (they are in `.gitignore`).
 
 ## Stack
 
-- Java 25, Spring Boot 4.1.1, Maven (use the wrapper `./mvnw`)
+- Java 25, Spring Boot 4.1.1, Maven (use the wrapper `../mvnw`)
 - Web: `spring-boot-starter-webmvc` (servlet-based Spring MVC, not WebFlux)
 - Persistence: `spring-boot-starter-jdbc` (plain JDBC / `JdbcClient`, **no JPA or Hibernate**), PostgreSQL driver
-- Schema: Flyway. Migrations go in `src/main/resources/db/migration/` as `V<n>__<description>.sql`. Flyway runs them on startup, so change the schema through new migrations, never by editing applied ones.
+- Schema: Flyway. Migrations go in `../src/main/resources/db/migration` as `V<n>__<description>.sql`. Flyway runs them on startup, so change the schema through new migrations, never by editing applied ones.
 - Actuator for health and metrics endpoints
 
 Base package: `io.github.hindih3.commuteplanner`. Component scanning starts from `CommutePlannerApplication`, so new beans must live in this package or its subpackages.
