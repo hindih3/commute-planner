@@ -11,7 +11,7 @@ class PlannerTest {
             new Segment(1, null, Mode.WALK, "Exit Union Station", 3, null, null),
             new Segment(2, 1,    Mode.WALK, "Walk to campus",     20, null, null),
             new Segment(3, 1,    Mode.WALK, "Walk to bus stop",   4, null, null),
-            new Segment(4, 3,    Mode.BUS,  "157 to building",    5, "157", "Clinton")
+            new Segment(4, 3,    Mode.BUS,  "157 to building",    5, "157", 1)
     );
 
     List<LocalTime> busTimes = List.of(LocalTime.of(8, 0), LocalTime.of(8, 20));

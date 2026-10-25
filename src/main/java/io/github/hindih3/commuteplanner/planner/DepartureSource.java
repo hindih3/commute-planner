@@ -5,5 +5,5 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface DepartureSource {
-    Optional<LocalTime> next(String line, String stop, LocalTime after);
+    Optional<LocalTime> next(String line, int stopId, LocalTime after);
 }

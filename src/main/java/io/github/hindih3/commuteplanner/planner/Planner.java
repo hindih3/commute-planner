@@ -51,7 +51,7 @@ public class Planner {
                          List<Segment> path, List<Plan> results) {
         // 1. Advance the clock through this segment.
         if (seg.isTransit()) {
-            Optional<LocalTime> departs = departures.next(seg.line(), seg.boardingStop(), clock);
+            Optional<LocalTime> departs = departures.next(seg.line(), seg.boardingStopId(), clock);
             if (departs.isEmpty()) {
                 return; // no more service today: dead branch
             }
