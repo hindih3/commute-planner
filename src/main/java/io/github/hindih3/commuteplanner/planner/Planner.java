@@ -12,9 +12,6 @@ import java.util.Optional;
  * Explores every path through the segment tree and returns the ones that
  * reach a leaf (the door) by the deadline, earliest arrival first.
  *
- * Plain Java on purpose: no Spring, no database. Whatever DepartureSource
- * you hand it (a fake in tests, Postgres or the CTA API later) is the only
- * thing that knows about schedules.
  */
 public class Planner {
 
