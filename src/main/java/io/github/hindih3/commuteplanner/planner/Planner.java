@@ -48,31 +48,32 @@ public class Planner {
 
     private void explore(Segment seg, LocalTime clock, LocalTime deadline,
                          Map<Integer, List<Segment>> childrenOf,
-                         List<Segment> path, List<Plan> results) {
-        // 1. Advance the clock through this segment.
+                         List<Leg> path, List<Plan> results) {
+        // 1. Work out when this segment starts and ends.
+        LocalTime departs = clock; // walks start right away
         if (seg.isTransit()) {
-            Optional<LocalTime> departs = departures.next(seg.line(), seg.boardingStopId(), clock);
-            if (departs.isEmpty()) {
+            Optional<LocalTime> next = departures.next(seg.line(), seg.boardingStopId(), clock);
+            if (next.isEmpty()) {
                 return; // no more service today: dead branch
             }
-            clock = departs.get(); // the wait happens here
+            departs = next.get(); // the wait happens here
         }
-        clock = clock.plusMinutes(seg.minutes()); // walk time, or ride time
+        LocalTime arrives = departs.plusMinutes(seg.minutes()); // walk time, or ride time
 
         // 2. Prune: already too late, so nothing below this can make it.
-        if (clock.isAfter(deadline)) {
+        if (arrives.isAfter(deadline)) {
             return;
         }
 
-        path.add(seg);
+        path.add(new Leg(seg, departs, arrives));
 
         // 3. Leaf = at the door. Otherwise try every child.
         List<Segment> children = childrenOf.getOrDefault(seg.id(), List.of());
         if (children.isEmpty()) {
-            results.add(new Plan(List.copyOf(path), clock));
+            results.add(new Plan(List.copyOf(path), arrives));
         } else {
             for (Segment child : children) {
-                explore(child, clock, deadline, childrenOf, path, results);
+                explore(child, arrives, deadline, childrenOf, path, results);
             }
         }
 

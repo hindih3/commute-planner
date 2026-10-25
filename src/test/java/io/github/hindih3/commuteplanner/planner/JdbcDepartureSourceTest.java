@@ -52,6 +52,6 @@ class JdbcDepartureSourceTest {
 
         assertThat(plans).hasSize(5);
         assertThat(plans.getFirst().arrival()).isEqualTo(LocalTime.of(7, 43));
-        assertThat(plans.getFirst().legs().getLast().description()).isEqualTo("157 to building");
+        assertThat(plans.getFirst().legs().getLast().segment().description()).isEqualTo("157 to building");
     }
 }

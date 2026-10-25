@@ -33,7 +33,19 @@ class PlannerTest {
     void walkingWinsWhenYouJustMissTheBus() {
         // 7:55 → at stop 8:02, missed it, next bus 8:20 → 8:25. Walking: 8:18.
         List<Plan> plans = planner.plan(tree, LocalTime.of(7, 55), LocalTime.of(9, 0));
-        assertThat(plans.getFirst().legs().getLast().description()).isEqualTo("Walk to campus");
+        assertThat(plans.getFirst().legs().getLast().segment().description()).isEqualTo("Walk to campus");
+    }
+
+    @Test
+    void legsShowTheWaitForTheBus() {
+        // At the stop 7:52, but the bus leaves 8:00: the 8-minute wait sits between the two legs.
+        List<Leg> legs = planner.plan(tree, LocalTime.of(7, 45), LocalTime.of(9, 0)).getFirst().legs();
+        Leg walk = legs.get(1);
+        Leg bus = legs.get(2);
+
+        assertThat(walk.arrives()).isEqualTo(LocalTime.of(7, 52));
+        assertThat(bus.departs()).isEqualTo(LocalTime.of(8, 0));
+        assertThat(bus.arrives()).isEqualTo(LocalTime.of(8, 5));
     }
 
     @Test

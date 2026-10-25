@@ -29,6 +29,18 @@ class PlanControllerTest {
     }
 
     @Test
+    void legsShowWhenEachStepHappens() {
+        // At the 157 stop at 7:35, and the bus leaves at 7:35: the tight connection is visible
+        assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
+                .bodyJson()
+                .extractingPath("$[0].legs[1].arrives").isEqualTo("07:35:00");
+
+        assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
+                .bodyJson()
+                .extractingPath("$[0].legs[2].departs").isEqualTo("07:35:00");
+    }
+
+    @Test
     void missingParameterIsABadRequest() {
         assertThat(mvc.get().uri("/plans?start=07:30")).hasStatus4xxClientError();
     }
