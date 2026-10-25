@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 // Starts the whole app with a fake browser (MockMvcTester) instead of a real server,
 // so these requests go through the controller, planner and database for real.
-@SpringBootTest
+// Live CTA data is off so results don't depend on where real buses are right now.
+@SpringBootTest(properties = "cta.live.enabled=false")
 @AutoConfigureMockMvc
 class PlanControllerTest {
 
