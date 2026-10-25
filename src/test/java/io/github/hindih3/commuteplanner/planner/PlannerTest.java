@@ -20,7 +20,8 @@ class PlannerTest {
     DepartureSource fake = (line, stop, after) ->
             busTimes.stream().filter(t -> !t.isBefore(after)).findFirst();
 
-    Planner planner = new Planner(fake);
+    // No boarding buffer, so the times below are exact
+    Planner planner = new Planner(fake, 0);
 
     @Test
     void busWinsWhenYouCatchIt() {
@@ -46,6 +47,21 @@ class PlannerTest {
         assertThat(walk.arrives()).isEqualTo(LocalTime.of(7, 52));
         assertThat(bus.departs()).isEqualTo(LocalTime.of(8, 0));
         assertThat(bus.arrives()).isEqualTo(LocalTime.of(8, 5));
+    }
+
+    @Test
+    void bufferSkipsABusYouWouldOnlyJustMake() {
+        // 7:52 + 3 + 4 = 7:59 at the stop, bus at 8:00. Walking arrives 8:15.
+        LocalTime start = LocalTime.of(7, 52);
+
+        // Without a buffer, the 1-minute connection counts: bus arrives 8:05
+        assertThat(planner.plan(tree, start, LocalTime.of(9, 0)).getFirst().arrival())
+                .isEqualTo(LocalTime.of(8, 5));
+
+        // With 2 minutes, you need to be there by 7:58, so the next bus is 8:20 (8:25) and walking wins
+        List<Plan> buffered = new Planner(fake, 2).plan(tree, start, LocalTime.of(9, 0));
+        assertThat(buffered.getFirst().legs().getLast().segment().description()).isEqualTo("Walk to campus");
+        assertThat(buffered.getLast().arrival()).isEqualTo(LocalTime.of(8, 25));
     }
 
     @Test

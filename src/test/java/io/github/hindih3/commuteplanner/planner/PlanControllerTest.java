@@ -25,19 +25,20 @@ class PlanControllerTest {
 
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
-                .extractingPath("$[0].arrival").isEqualTo("07:43:00"); // Jackson writes seconds too
+                .extractingPath("$[0].arrival").isEqualTo("07:51:00"); // Jackson writes seconds too
     }
 
     @Test
-    void legsShowWhenEachStepHappens() {
-        // At the 157 stop at 7:35, and the bus leaves at 7:35: the tight connection is visible
+    void boardingBufferSkipsTheBusYouWouldOnlyJustMake() {
+        // At the 157 stop at 7:35. The 7:35 bus is too tight with the 2-minute buffer,
+        // so the plan waits for the 7:43 one
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
                 .extractingPath("$[0].legs[1].arrives").isEqualTo("07:35:00");
 
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
-                .extractingPath("$[0].legs[2].departs").isEqualTo("07:35:00");
+                .extractingPath("$[0].legs[2].departs").isEqualTo("07:43:00");
     }
 
     @Test

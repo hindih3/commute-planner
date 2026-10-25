@@ -47,7 +47,7 @@ class JdbcDepartureSourceTest {
     void plannerRunsOnDatabaseData() {
         // Leaving at 7:30 you reach the 157 stop at 7:35, just as one leaves:
         // the fastest of all 5 routes, arriving 7:43
-        Planner planner = new Planner(departures);
+        Planner planner = new Planner(departures, 0); // no buffer: the raw schedule
         List<Plan> plans = planner.plan(segments.findAll(), LocalTime.of(7, 30), LocalTime.of(8, 30));
 
         assertThat(plans).hasSize(5);

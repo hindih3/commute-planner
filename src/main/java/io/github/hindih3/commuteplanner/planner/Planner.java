@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,9 +20,13 @@ import org.springframework.stereotype.Component;
 public class Planner {
 
     private final DepartureSource departures;
+    private final int boardingBufferMinutes;
 
-    public Planner(DepartureSource departures) {
+    // @Value reads planner.boarding-buffer-minutes from application.properties.
+    public Planner(DepartureSource departures,
+                   @Value("${planner.boarding-buffer-minutes:2}") int boardingBufferMinutes) {
         this.departures = departures;
+        this.boardingBufferMinutes = boardingBufferMinutes;
     }
 
     public List<Plan> plan(List<Segment> segments, LocalTime start, LocalTime deadline) {
@@ -52,7 +57,10 @@ public class Planner {
         // 1. Work out when this segment starts and ends.
         LocalTime departs = clock; // walks start right away
         if (seg.isTransit()) {
-            Optional<LocalTime> next = departures.next(seg.line(), seg.boardingStopId(), clock);
+            // Only count a departure you'd be at the stop a few minutes early for:
+            // buses come early, and a 0-minute connection is a gamble.
+            LocalTime readyToBoard = clock.plusMinutes(boardingBufferMinutes);
+            Optional<LocalTime> next = departures.next(seg.line(), seg.boardingStopId(), readyToBoard);
             if (next.isEmpty()) {
                 return; // no more service today: dead branch
             }
