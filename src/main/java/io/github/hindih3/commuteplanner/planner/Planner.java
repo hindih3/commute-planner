@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Explores every path through the segment tree and returns the ones that
  * reach a leaf (the door) by the deadline, earliest arrival first.
  *
  */
+@Component
 public class Planner {
 
     private final DepartureSource departures;
