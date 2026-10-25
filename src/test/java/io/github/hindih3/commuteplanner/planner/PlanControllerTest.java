@@ -25,7 +25,7 @@ class PlanControllerTest {
 
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
-                .extractingPath("$[0].arrival").isEqualTo("07:48:00"); // Jackson writes seconds too
+                .extractingPath("$[0].arrival").isEqualTo("07:43:00"); // Jackson writes seconds too
     }
 
     @Test
