@@ -20,12 +20,15 @@ public class SegmentRepository {
         this.jdbc = jdbc;
     }
 
-    public List<Segment> findAll() {
+    /** One commute's tree. Planner needs exactly one root, so never load both at once. */
+    public List<Segment> findByCommute(Commute commute) {
         return jdbc.sql("""
             SELECT id, parent_id, mode, description, minutes, line, boarding_stop_id
             FROM segment
+            WHERE commute = :commute
             ORDER BY id
             """)
+                .param("commute", commute.name())
                 // Called once per row: copy each column into the matching Segment field.
                 .query((row, rowNum) -> new Segment(
                         row.getInt("id"),

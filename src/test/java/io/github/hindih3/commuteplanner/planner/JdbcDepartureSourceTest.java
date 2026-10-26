@@ -44,11 +44,17 @@ class JdbcDepartureSourceTest {
     }
 
     @Test
+    void returnTripStopsHaveTheirOwnSchedule() {
+        // 157 eastbound at Taylor & Halsted leaves ... 16:52, 17:05, 17:18 ...
+        assertThat(departures.next("157", 5, LocalTime.of(17, 0))).contains(LocalTime.of(17, 5));
+    }
+
+    @Test
     void plannerRunsOnDatabaseData() {
         // Leaving at 7:30 you reach the 157 stop at 7:35, just as one leaves:
         // the fastest of all 5 routes, arriving 7:43
         Planner planner = new Planner(departures, 0); // no buffer: the raw schedule
-        List<Plan> plans = planner.plan(segments.findAll(), LocalTime.of(7, 30), LocalTime.of(8, 30));
+        List<Plan> plans = planner.plan(segments.findByCommute(Commute.TO_CAMPUS), LocalTime.of(7, 30), LocalTime.of(8, 30));
 
         assertThat(plans).hasSize(5);
         assertThat(plans.getFirst().arrival()).isEqualTo(LocalTime.of(7, 43));

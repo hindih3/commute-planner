@@ -15,20 +15,29 @@ class SegmentRepositoryTest {
 
     @Test
     void loadsTheSeededTree() {
-        List<Segment> segments = repository.findAll();
+        List<Segment> segments = repository.findByCommute(Commute.TO_CAMPUS);
         assertThat(segments).hasSize(12);
     }
 
     @Test
     void rootHasNullParentNotZero() {
-        Segment root = repository.findAll().getFirst();
+        Segment root = repository.findByCommute(Commute.TO_CAMPUS).getFirst();
         assertThat(root.description()).isEqualTo("Exit Union Station");
         assertThat(root.parentId()).isNull();
     }
 
     @Test
     void busRowIsMappedFieldByField() {
-        Segment bus = repository.findAll().get(2); // id 3: "157 to building"
+        Segment bus = repository.findByCommute(Commute.TO_CAMPUS).get(2); // id 3: "157 to building"
         assertThat(bus).isEqualTo(new Segment(3, 2, Mode.BUS, "157 to building", 8, "157", 1));
+    }
+
+    @Test
+    void eachCommuteHasItsOwnTreeWithOneRoot() {
+        List<Segment> home = repository.findByCommute(Commute.TO_UNION);
+        assertThat(home).hasSize(14);
+        assertThat(home).filteredOn(s -> s.parentId() == null)
+                .extracting(Segment::description)
+                .containsExactly("Leave class");
     }
 }

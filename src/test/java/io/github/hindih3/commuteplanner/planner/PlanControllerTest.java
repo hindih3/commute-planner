@@ -24,22 +24,50 @@ class PlanControllerTest {
                 .bodyJson()
                 .extractingPath("$.length()").isEqualTo(5);
 
+        // With the measured 15-minute walk, walking (7:48) beats every bus from 7:30
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
-                .extractingPath("$[0].arrival").isEqualTo("07:51:00"); // Jackson writes seconds too
+                .extractingPath("$[0].arrival").isEqualTo("07:48:00"); // Jackson writes seconds too
     }
 
     @Test
     void boardingBufferSkipsTheBusYouWouldOnlyJustMake() {
-        // At the 157 stop at 7:35. The 7:35 bus is too tight with the 2-minute buffer,
-        // so the plan waits for the 7:43 one
+        // Plan 1 is the 157. At its stop at 7:35, the 7:35 bus is too tight with the
+        // 2-minute buffer, so the plan waits for the 7:43 one (arriving 7:51)
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
-                .extractingPath("$[0].legs[1].arrives").isEqualTo("07:35:00");
+                .extractingPath("$[1].legs[1].arrives").isEqualTo("07:35:00");
 
         assertThat(mvc.get().uri("/plans?start=07:30&deadline=08:30"))
                 .bodyJson()
-                .extractingPath("$[0].legs[2].departs").isEqualTo("07:43:00");
+                .extractingPath("$[1].legs[2].departs").isEqualTo("07:43:00");
+    }
+
+    @Test
+    void plansTheTripHome() {
+        // Leaving class at 17:00 with a 17:40 deadline: walking (17:18) first,
+        // then the 157 eastbound, which leaves Taylor & Halsted at 17:05 (17:20)
+        assertThat(mvc.get().uri("/plans?commute=TO_UNION&start=17:00&deadline=17:40"))
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.length()").isEqualTo(5);
+
+        assertThat(mvc.get().uri("/plans?commute=TO_UNION&start=17:00&deadline=17:40"))
+                .bodyJson()
+                .extractingPath("$[0].legs[0].segment.description").isEqualTo("Leave class");
+
+        assertThat(mvc.get().uri("/plans?commute=TO_UNION&start=17:00&deadline=17:40"))
+                .bodyJson()
+                .extractingPath("$[0].arrival").isEqualTo("17:18:00");
+
+        assertThat(mvc.get().uri("/plans?commute=TO_UNION&start=17:00&deadline=17:40"))
+                .bodyJson()
+                .extractingPath("$[1].legs[2].departs").isEqualTo("17:05:00");
+    }
+
+    @Test
+    void unknownCommuteIsABadRequest() {
+        assertThat(mvc.get().uri("/plans?commute=NOWHERE&start=17:00&deadline=17:40")).hasStatus4xxClientError();
     }
 
     @Test
