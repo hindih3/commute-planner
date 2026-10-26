@@ -45,8 +45,8 @@ class JdbcDepartureSourceTest {
 
     @Test
     void returnTripStopsHaveTheirOwnSchedule() {
-        // 157 eastbound at Taylor & Halsted leaves ... 16:52, 17:05, 17:18 ...
-        assertThat(departures.next("157", 5, LocalTime.of(17, 0))).contains(LocalTime.of(17, 5));
+        // 157 eastbound at 900 W Taylor leaves ... 16:51, 17:04, 17:17 ...
+        assertThat(departures.next("157", 5, LocalTime.of(17, 0))).contains(LocalTime.of(17, 4));
     }
 
     @Test

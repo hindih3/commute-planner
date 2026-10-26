@@ -46,7 +46,7 @@ class PlanControllerTest {
     @Test
     void plansTheTripHome() {
         // Leaving class at 17:00 with a 17:40 deadline: walking (17:18) first,
-        // then the 157 eastbound, which leaves Taylor & Halsted at 17:05 (17:20)
+        // then the 157 eastbound, which leaves 900 W Taylor at 17:04 (17:19)
         assertThat(mvc.get().uri("/plans?commute=TO_UNION&start=17:00&deadline=17:40"))
                 .hasStatusOk()
                 .bodyJson()
@@ -62,7 +62,7 @@ class PlanControllerTest {
 
         assertThat(mvc.get().uri("/plans?commute=TO_UNION&start=17:00&deadline=17:40"))
                 .bodyJson()
-                .extractingPath("$[1].legs[2].departs").isEqualTo("17:05:00");
+                .extractingPath("$[1].legs[2].departs").isEqualTo("17:04:00");
     }
 
     @Test
